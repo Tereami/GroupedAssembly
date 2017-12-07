@@ -43,7 +43,7 @@ namespace GroupedAssembly
 
             PushButton btnGroupedAssembly = panel1.AddItem(new PushButtonData(
                 "GroupedAssembly",
-                "Сгруппированная\nСборка",
+                "Группо-\nсборка",
                 assemblyPath,
                 "GroupedAssembly.CommandGroupedAssembly")
                 ) as PushButton;
