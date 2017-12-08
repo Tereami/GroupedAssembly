@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Application">    
+    <Name>GroupedAssembly</Name>
+	<Assembly>
+      C:\Users\a.zuev\YandexDisk\c sharp\GroupedAssembly\GroupedAssembly\bin\Debug\GroupedAssembly.dll
+    </Assembly>
+    <ClientId>fab775da-a88b-4042-8342-169e47238177</ClientId>
+    <FullClassName>GroupedAssembly.App</FullClassName>
+    <VendorId>Weandrevit</VendorId>
+    <VendorDescription>weandrevit.blogspot.com</VendorDescription>
+  </AddIn>
+</RevitAddIns>
