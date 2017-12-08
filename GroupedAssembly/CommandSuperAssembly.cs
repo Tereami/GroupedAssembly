@@ -36,20 +36,38 @@ namespace GroupedAssembly
             string name = form.NameText;
 
             List<ElementId> selids = sel.GetElementIds().ToList();
+            List<ElementId> allIds = new List<ElementId>();
 
-            AssemblyInstance ai = null;
+            Group group = null;
+
             using (Transaction t = new Transaction(doc))
             {
-                ai = AssemblyUtil.CreateAssembly(doc, t, selids, name);
-            }
-            if (ai == null)
-            {
-                message = "Не удалось создать сборку.";
-                return Result.Failed;
+                t.Start("Создание сборки");
+
+                allIds = AssemblyUtil.GetAllNestedIds(doc, selids, name);
+                Element mainElem = doc.GetElement(selids.First());
+                AssemblyInstance ai = AssemblyInstance.Create(doc, allIds, mainElem.Category.Id);
+
+                t.Commit();
+
+                t.Start("Именование сборки");
+                ai.AssemblyTypeName = name;
+                t.Commit();
+
+
+                t.Start("Создание группы");
+                group = doc.Create.NewGroup(allIds);
+
+                t.Commit();
+
+                t.Start("Именование группы");
+                GroupType gtype = group.GroupType;
+                gtype.Name = name;
+                t.Commit();
             }
 
-            List<ElementId> assemblyId = new List<ElementId> { ai.Id };
-            sel.SetElementIds(assemblyId);
+            List<ElementId> groupId = new List<ElementId> { group.Id };
+            sel.SetElementIds(groupId);
 
             return Result.Succeeded;
         }

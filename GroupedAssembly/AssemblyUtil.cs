@@ -12,21 +12,12 @@ namespace GroupedAssembly
 {
     public static class AssemblyUtil
     {
-        public static AssemblyInstance CreateAssembly(Document doc, Transaction t, List<ElementId> ids, string name)
+        public static List<ElementId> GetAllNestedIds(Document doc, List<ElementId> selectedIds, string name)
         {
-            try
-            {
-                t.Start("Создание сборки");
-            }
-            catch
-            {
-                t.Commit();
-                t.Start("Создание сборки");
-            }
 
             List<ElementId> ids2 = new List<ElementId>();
 
-            foreach (ElementId id in ids)
+            foreach (ElementId id in selectedIds)
             {
                 ids2.Add(id);
                 Element elem = doc.GetElement(id);
@@ -42,45 +33,11 @@ namespace GroupedAssembly
 
             if (ids2.Count == 0) return null;
 
-            Element mainElem = doc.GetElement(ids2.First());
+            
 
-            AssemblyInstance ai = AssemblyInstance.Create(doc, ids2, mainElem.Category.Id);
-
-            t.Commit();
-
-            t.Start("Именование сборки");
-            ai.AssemblyTypeName = name;
-            t.Commit();
-
-            return ai;
+            return ids2;
         }
 
-        public static Group CreateGroup(Document doc, Transaction t, List<Element> elems, string name)
-        {
-            try
-            {
-                t.Start("Создание группы");
-            }
-            catch
-            {
-                t.Commit();
-                t.Start("Создание группы");
-            }
-
-
-            List<ElementId> ids2 = elems.Select(i => i.Id).ToList();
-
-            Group group = doc.Create.NewGroup(ids2);
-
-            t.Commit();
-
-            t.Start("Cоздание группы для изделия2");
-            GroupType gtype = group.GroupType;
-            gtype.Name = name;
-            t.Commit();
-
-            return group;
-        }
 
 
 
