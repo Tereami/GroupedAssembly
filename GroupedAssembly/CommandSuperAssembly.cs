@@ -53,8 +53,7 @@ namespace GroupedAssembly
                 t.Start("Именование сборки");
                 ai.AssemblyTypeName = name;
                 t.Commit();
-
-
+                
                 t.Start("Создание группы");
                 group = doc.Create.NewGroup(allIds);
 
