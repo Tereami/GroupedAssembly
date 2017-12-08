@@ -28,6 +28,7 @@ namespace GroupedAssembly
 
             foreach (ElementId id in ids)
             {
+                ids2.Add(id);
                 Element elem = doc.GetElement(id);
                 FamilyInstance fi = elem as FamilyInstance;
                 if (fi == null) continue;
@@ -36,12 +37,14 @@ namespace GroupedAssembly
                 if (nestedFamInstances.Count == 0) continue;
 
                 List<ElementId> nestedFiIds = nestedFamInstances.Select(i => i.Id).ToList();
-
-                ids2.Add(id);
                 ids2.AddRange(nestedFiIds);
             }
 
-            AssemblyInstance ai = AssemblyInstance.Create(doc, ids2, new ElementId(BuiltInCategory.OST_Rebar));
+            if (ids2.Count == 0) return null;
+
+            Element mainElem = doc.GetElement(ids2.First());
+
+            AssemblyInstance ai = AssemblyInstance.Create(doc, ids2, mainElem.Category.Id);
 
             t.Commit();
 
@@ -94,14 +97,15 @@ namespace GroupedAssembly
                 FamilyInstance nestedFi = doc.GetElement(id) as FamilyInstance;
                 if (nestedFi == null) continue;
 
-                Family nestedFam = fi.Symbol.Family;
+                Family nestedFam = nestedFi.Symbol.Family;
                 if (string.IsNullOrEmpty(nestedFam.Name)) continue;
                 if (nestedFam.get_Parameter(BuiltInParameter.FAMILY_SHARED).AsInteger() != 1) continue;
                 if (nestedFam.IsEditable != true) continue;
 
                 nestedFams.Add(nestedFi);
 
-                nestedFams.AddRange(GetAllSharedNestedFamInstances(nestedFi));
+                List<FamilyInstance> nestedFams2 = GetAllSharedNestedFamInstances(nestedFi);
+                nestedFams.AddRange(nestedFams2);
             }
 
             return nestedFams;

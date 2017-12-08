@@ -38,17 +38,18 @@ namespace GroupedAssembly
                 assemblyPath,
                 "GroupedAssembly.CommandSuperAssembly")
                 ) as PushButton;
-            btnSuperAssembly.LargeImage = PngImageSource("GroupedAssembly.Icons.Settings.png");
-            btnSuperAssembly.ToolTip = "Создание сборки, включающей все вложенные элементы";
+            btnSuperAssembly.Image= PngImageSource("GroupedAssembly.Icons.SuperAssemblySmall.png");
+            btnSuperAssembly.LargeImage = PngImageSource("GroupedAssembly.Icons.SuperAssemblyBig.png");
+            btnSuperAssembly.ToolTip = "Создание сгруппированной сборки, с включением всех вложенных элементов";
 
-            PushButton btnGroupedAssembly = panel1.AddItem(new PushButtonData(
-                "GroupedAssembly",
-                "Группо-\nсборка",
-                assemblyPath,
-                "GroupedAssembly.CommandGroupedAssembly")
-                ) as PushButton;
-            //btn1.LargeImage = PngImageSource("GroupedAssembly.Icons.Settings.png");
-            btnGroupedAssembly.ToolTip = "Создание сгруппированной сборки (элементов, одновременно входящих в сборку и в группу)";
+            //PushButton btnGroupedAssembly = panel1.AddItem(new PushButtonData(
+            //    "GroupedAssembly",
+            //    "Группо-\nсборка",
+            //    assemblyPath,
+            //    "GroupedAssembly.CommandGroupedAssembly")
+            //    ) as PushButton;
+            ////btn1.LargeImage = PngImageSource("GroupedAssembly.Icons.Settings.png");
+            //btnGroupedAssembly.ToolTip = "Создание сгруппированной сборки (элементов, одновременно входящих в сборку и в группу)";
 
 
             return Result.Succeeded;

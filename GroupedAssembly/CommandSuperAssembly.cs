@@ -42,6 +42,12 @@ namespace GroupedAssembly
             {
                 ai = AssemblyUtil.CreateAssembly(doc, t, selids, name);
             }
+            if (ai == null)
+            {
+                message = "Не удалось создать сборку.";
+                return Result.Failed;
+            }
+
             List<ElementId> assemblyId = new List<ElementId> { ai.Id };
             sel.SetElementIds(assemblyId);
 

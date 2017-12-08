@@ -53,7 +53,6 @@
   <ItemGroup>
     <Compile Include="App.cs" />
     <Compile Include="AssemblyUtil.cs" />
-    <Compile Include="CommandGroupedAssembly.cs" />
     <Compile Include="CommandSuperAssembly.cs" />
     <Compile Include="FormEnterName.cs">
       <SubType>Form</SubType>
@@ -75,6 +74,8 @@
     <Content Include="GroupedAssembly.addin">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <EmbeddedResource Include="Icons\SuperAssemblyBig.png" />
+    <EmbeddedResource Include="Icons\SuperAssemblySmall.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
