@@ -72,7 +72,7 @@
     <EmbeddedResource Include="Icons\Settings.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Addin\GroupedAssembly.addin">
+    <Content Include="GroupedAssembly.addin">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

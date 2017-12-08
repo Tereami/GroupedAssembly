@@ -3,7 +3,7 @@
   <AddIn Type="Application">    
     <Name>GroupedAssembly</Name>
 	<Assembly>
-      C:\Users\a.zuev\YandexDisk\c sharp\GroupedAssembly\GroupedAssembly\bin\Debug\GroupedAssembly.dll
+      GroupedAssembly.dll
     </Assembly>
     <ClientId>fab775da-a88b-4042-8342-169e47238177</ClientId>
     <FullClassName>GroupedAssembly.App</FullClassName>
