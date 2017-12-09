@@ -81,6 +81,7 @@
             this.Controls.Add(this.label1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "FormEnterName";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Укажите имя";
             this.Load += new System.EventHandler(this.FormEnterName_Load);
             this.ResumeLayout(false);
