@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="App.cs" />
     <Compile Include="AssemblyUtil.cs" />
+    <Compile Include="AllowedForAssembly.cs" />
     <Compile Include="CommandSuperAssembly.cs" />
     <Compile Include="FormEnterName.cs">
       <SubType>Form</SubType>
