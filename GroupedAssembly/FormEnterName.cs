@@ -13,6 +13,8 @@ namespace GroupedAssembly
     public partial class FormEnterName : Form
     {
         public string NameText;
+        public bool GroupedElements;
+        public bool UntouchBeams;
 
         public string LabelText
         {
@@ -35,6 +37,8 @@ namespace GroupedAssembly
         private void btnOk_Click(object sender, EventArgs e)
         {
             NameText = txtBoxName.Text;
+            GroupedElements = checkBoxGroupElements.Checked;
+            UntouchBeams = checkBoxUntouchBeams.Checked;
             this.DialogResult = DialogResult.OK;
             this.Close();
 

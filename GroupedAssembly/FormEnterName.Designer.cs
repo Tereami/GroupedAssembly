@@ -32,6 +32,8 @@
             this.txtBoxName = new System.Windows.Forms.TextBox();
             this.btnOk = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
+            this.checkBoxGroupElements = new System.Windows.Forms.CheckBox();
+            this.checkBoxUntouchBeams = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // label1
@@ -52,7 +54,8 @@
             // 
             // btnOk
             // 
-            this.btnOk.Location = new System.Drawing.Point(207, 51);
+            this.btnOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnOk.Location = new System.Drawing.Point(207, 142);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(75, 23);
             this.btnOk.TabIndex = 2;
@@ -62,7 +65,8 @@
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(126, 51);
+            this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnCancel.Location = new System.Drawing.Point(126, 142);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 3;
@@ -70,11 +74,37 @@
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
+            // checkBoxGroupElements
+            // 
+            this.checkBoxGroupElements.AutoSize = true;
+            this.checkBoxGroupElements.Checked = true;
+            this.checkBoxGroupElements.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBoxGroupElements.Location = new System.Drawing.Point(10, 81);
+            this.checkBoxGroupElements.Name = "checkBoxGroupElements";
+            this.checkBoxGroupElements.Size = new System.Drawing.Size(156, 17);
+            this.checkBoxGroupElements.TabIndex = 4;
+            this.checkBoxGroupElements.Text = "Сгруппировать элементы";
+            this.checkBoxGroupElements.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxUntouchBeams
+            // 
+            this.checkBoxUntouchBeams.AutoSize = true;
+            this.checkBoxUntouchBeams.Checked = true;
+            this.checkBoxUntouchBeams.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBoxUntouchBeams.Location = new System.Drawing.Point(10, 104);
+            this.checkBoxUntouchBeams.Name = "checkBoxUntouchBeams";
+            this.checkBoxUntouchBeams.Size = new System.Drawing.Size(113, 17);
+            this.checkBoxUntouchBeams.TabIndex = 5;
+            this.checkBoxUntouchBeams.Text = "Открепить балки";
+            this.checkBoxUntouchBeams.UseVisualStyleBackColor = true;
+            // 
             // FormEnterName
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(294, 83);
+            this.ClientSize = new System.Drawing.Size(294, 174);
+            this.Controls.Add(this.checkBoxUntouchBeams);
+            this.Controls.Add(this.checkBoxGroupElements);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOk);
             this.Controls.Add(this.txtBoxName);
@@ -94,5 +124,7 @@
         private System.Windows.Forms.TextBox txtBoxName;
         private System.Windows.Forms.Button btnOk;
         private System.Windows.Forms.Button btnCancel;
+        private System.Windows.Forms.CheckBox checkBoxGroupElements;
+        private System.Windows.Forms.CheckBox checkBoxUntouchBeams;
     }
 }
