@@ -43,6 +43,9 @@ namespace GroupedAssembly
             List<ElementId> allIds = new List<ElementId>();
 
             Group group = null;
+            AssemblyInstance ai = null;
+
+            allIds = AssemblyUtil.GetAllNestedIds(doc, selids, name);
 
             using (Transaction t = new Transaction(doc))
             {
@@ -85,25 +88,45 @@ namespace GroupedAssembly
 
                 allIds = AssemblyUtil.GetAllNestedIds(doc, selids, name);
                 Element mainElem = doc.GetElement(selids.First());
-                AssemblyInstance ai = AssemblyInstance.Create(doc, allIds, mainElem.Category.Id);
-
-                t.Commit();
-
-                t.Start("Именование сборки");
-                ai.AssemblyTypeName = name;
-                t.Commit();
-
-                if (groupedElements == true)
+                try
                 {
-                    t.Start("Создание группы");
-                    group = doc.Create.NewGroup(allIds);
+                    t.Start("Создание сборки");
+                    ai = AssemblyInstance.Create(doc, allIds, mainElem.Category.Id);
+                    t.Commit();
+                }
+                catch (Exception ex)
+                {
+                    message += "Не удалось создать сборку: " + ex.Message;
+                    return Result.Failed;
+                }
+
+                try
+                {
+
+                    t.Start("Именование сборки");
+                    ai.AssemblyTypeName = name;
+                    t.Commit();
+                }
+                catch
+                {
+                    message += "\nНе удалось задать имя сборки. Установлено имя: " + ai.AssemblyTypeName;
+                }
+                
+                t.Start("Создание группы");
+                group = doc.Create.NewGroup(allIds);
 
                     t.Commit();
 
+                try
+                {
                     t.Start("Именование группы");
                     GroupType gtype = group.GroupType;
                     gtype.Name = name;
                     t.Commit();
+                }
+                catch
+                {
+                    message += "\nНе удалось задать имя группы. Установлено имя: " + group.GroupType.Name;
                 }
             }
 
