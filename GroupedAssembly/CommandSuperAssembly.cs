@@ -50,6 +50,7 @@ namespace GroupedAssembly
             List<ElementId> finalSelIds = new List<ElementId>();
             using (Transaction t = new Transaction(doc))
             {
+                t.Start("SuperAssembly");
                 if (untouchBeams)
                 {
                     List<FamilyInstance> beams = new List<FamilyInstance>();
@@ -67,23 +68,26 @@ namespace GroupedAssembly
 
                     if (beams.Count > 0)
                     {
-                        t.Start("Открепление балок");
-
-                        foreach (FamilyInstance fin in beams)
+                        using (SubTransaction subt = new SubTransaction(doc))
                         {
-                            try
+                            subt.Start();
+
+                            foreach (FamilyInstance fin in beams)
                             {
-                                StructuralFramingUtils.DisallowJoinAtEnd(fin, 1);
-                                StructuralFramingUtils.DisallowJoinAtEnd(fin, 0);
+                                try
+                                {
+                                    StructuralFramingUtils.DisallowJoinAtEnd(fin, 1);
+                                    StructuralFramingUtils.DisallowJoinAtEnd(fin, 0);
 
-                                double oldElev = fin.get_Parameter(BuiltInParameter.STRUCTURAL_BEAM_END0_ELEVATION).AsDouble();
-                                fin.get_Parameter(BuiltInParameter.STRUCTURAL_BEAM_END0_ELEVATION).Set(1);
-                                fin.get_Parameter(BuiltInParameter.STRUCTURAL_BEAM_END0_ELEVATION).Set(oldElev);
+                                    double oldElev = fin.get_Parameter(BuiltInParameter.STRUCTURAL_BEAM_END0_ELEVATION).AsDouble();
+                                    fin.get_Parameter(BuiltInParameter.STRUCTURAL_BEAM_END0_ELEVATION).Set(1);
+                                    fin.get_Parameter(BuiltInParameter.STRUCTURAL_BEAM_END0_ELEVATION).Set(oldElev);
+                                }
+                                catch { }
                             }
-                            catch { }
-                        }
 
-                        t.Commit();
+                            subt.Commit();
+                        }
                     }
                 }
 
@@ -118,9 +122,12 @@ namespace GroupedAssembly
 
                 try
                 {
-                    t.Start("Создание сборки");
-                    ai = AssemblyInstance.Create(doc, idsForAssembly, mainElem.Category.Id);
-                    t.Commit();
+                    using (SubTransaction subt = new SubTransaction(doc))
+                    {
+                        subt.Start();
+                        ai = AssemblyInstance.Create(doc, idsForAssembly, mainElem.Category.Id);
+                        subt.Commit();
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -130,10 +137,12 @@ namespace GroupedAssembly
 
                 try
                 {
-
-                    t.Start("Именование сборки");
-                    ai.AssemblyTypeName = name;
-                    t.Commit();
+                    using (SubTransaction subt = new SubTransaction(doc))
+                    {
+                        subt.Start();
+                        ai.AssemblyTypeName = name;
+                        subt.Commit();
+                    }
                 }
                 catch
                 {
@@ -142,17 +151,23 @@ namespace GroupedAssembly
 
                 if (groupedElements)
                 {
-                    t.Start("Создание группы");
-                    group = doc.Create.NewGroup(allIds);
-                    t.Commit();
+                    using (SubTransaction subt = new SubTransaction(doc))
+                    {
+                        subt.Start();
+                        group = doc.Create.NewGroup(allIds);
+                        subt.Commit();
+                    }
                     finalSelIds.Add(group.Id);
 
                     try
                     {
-                        t.Start("Именование группы");
-                        GroupType gtype = group.GroupType;
-                        gtype.Name = name;
-                        t.Commit();
+                        using (SubTransaction subt = new SubTransaction(doc))
+                        {
+                            subt.Start();
+                            GroupType gtype = group.GroupType;
+                            gtype.Name = name;
+                            subt.Commit();
+                        }
                     }
                     catch
                     {
@@ -163,6 +178,7 @@ namespace GroupedAssembly
                 {
                     finalSelIds.Add(ai.Id);
                 }
+                t.Commit();
             }
 
             
