@@ -1,67 +1,52 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
-
 
 namespace GroupedAssembly
 {
     public static class AssemblyUtil
     {
-        public static List<ElementId> GetAllNestedIds(Document doc, List<ElementId> selectedIds, string name)
+        public static List<ElementId> GetAllNestedIds(Document doc, List<ElementId> selectedIds)
         {
+            var ids2 = new List<ElementId>();
 
-            List<ElementId> ids2 = new List<ElementId>();
-
-            foreach (ElementId id in selectedIds)
+            foreach (var id in selectedIds)
             {
                 ids2.Add(id);
-                Element elem = doc.GetElement(id);
-                FamilyInstance fi = elem as FamilyInstance;
-                if (fi == null) continue;
+                var elem = doc.GetElement(id);
+                if (!(elem is FamilyInstance fi)) continue;
 
-                List<FamilyInstance> nestedFamInstances = GetAllSharedNestedFamInstances(fi);
+                var nestedFamInstances = GetAllSharedNestedFamInstances(fi);
                 if (nestedFamInstances.Count == 0) continue;
 
-                List<ElementId> nestedFiIds = nestedFamInstances.Select(i => i.Id).ToList();
+                var nestedFiIds = nestedFamInstances.Select(i => i.Id).ToList();
                 ids2.AddRange(nestedFiIds);
             }
 
-            if (ids2.Count == 0) return null;
-
-            
-
-            return ids2;
+            return ids2.Count == 0 ? null : ids2;
         }
 
 
-
-
-        public static List<FamilyInstance> GetAllSharedNestedFamInstances (FamilyInstance fi)
+        private static List<FamilyInstance> GetAllSharedNestedFamInstances(FamilyInstance fi)
         {
-            List<FamilyInstance> nestedFams = new List<FamilyInstance>();
+            var nestedFams = new List<FamilyInstance>();
 
-            Document doc = fi.Document;
+            var doc = fi.Document;
 
-            ICollection<ElementId> nestedIds = fi.GetSubComponentIds();
+            var nestedIds = fi.GetSubComponentIds();
 
-            foreach(ElementId id in nestedIds)
+            foreach (var id in nestedIds)
             {
-                FamilyInstance nestedFi = doc.GetElement(id) as FamilyInstance;
-                if (nestedFi == null) continue;
+                if (!(doc.GetElement(id) is FamilyInstance nestedFi)) continue;
 
-                Family nestedFam = nestedFi.Symbol.Family;
+                var nestedFam = nestedFi.Symbol.Family;
                 if (string.IsNullOrEmpty(nestedFam.Name)) continue;
                 if (nestedFam.get_Parameter(BuiltInParameter.FAMILY_SHARED).AsInteger() != 1) continue;
                 if (nestedFam.IsEditable != true) continue;
 
                 nestedFams.Add(nestedFi);
 
-                List<FamilyInstance> nestedFams2 = GetAllSharedNestedFamInstances(nestedFi);
+                var nestedFams2 = GetAllSharedNestedFamInstances(nestedFi);
                 nestedFams.AddRange(nestedFams2);
             }
 

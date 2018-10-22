@@ -1,31 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace GroupedAssembly
 {
     public partial class FormEnterName : Form
     {
-        public string NameText;
         public bool GroupedElements;
+        public string NameText;
         public bool UntouchBeams;
-
-        public string LabelText
-        {
-            get { return label1.Text; }
-            set { label1.Text = value; }
-        }
 
         public FormEnterName()
         {
-            
             InitializeComponent();
+        }
+
+        public string LabelText
+        {
+            get => label1.Text;
+            set => label1.Text = value;
         }
 
         private void FormEnterName_Load(object sender, EventArgs e)
@@ -39,15 +31,14 @@ namespace GroupedAssembly
             NameText = txtBoxName.Text;
             GroupedElements = checkBoxGroupElements.Checked;
             UntouchBeams = checkBoxUntouchBeams.Checked;
-            this.DialogResult = DialogResult.OK;
-            this.Close();
-
+            DialogResult = DialogResult.OK;
+            Close();
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            this.DialogResult = DialogResult.Cancel;
-            this.Close();
+            DialogResult = DialogResult.Cancel;
+            Close();
         }
     }
 }

@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
 
 namespace GroupedAssembly
 {
     public static class AllowedForAssembly
     {
-        public static bool Check(Element elem)            
+        public static bool Check(Element elem)
         {
-            Category cat = elem.Category;
+            var cat = elem.Category;
 
             if (elem is AnalyticalModel) return false;
             if (elem is Truss) return false;
