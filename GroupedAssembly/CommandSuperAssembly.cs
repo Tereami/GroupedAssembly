@@ -95,8 +95,7 @@ namespace GroupedAssembly
                 foreach (var id in allIds)
                 {
                     var elem = doc.GetElement(id);
-                    var check = AllowedForAssembly.Check(elem);
-                    if (check == true)
+                    if (elem.CanAssembling())
                     {
                         idsForAssembly.Add(id);
                     }
