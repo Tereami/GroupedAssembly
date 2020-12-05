@@ -19,7 +19,8 @@ namespace GroupedAssembly
     {
         public bool GroupedElements;
         public string NameText;
-        public bool UntouchBeams;
+        public bool UntouchBeamsEnds;
+        public bool UntouchBeamsPlane;
 
         public FormEnterName()
         {
@@ -42,7 +43,9 @@ namespace GroupedAssembly
         {
             NameText = txtBoxName.Text;
             GroupedElements = checkBoxGroupElements.Checked;
-            UntouchBeams = checkBoxUntouchBeams.Checked;
+            UntouchBeamsEnds = checkBoxUntouchBeamsEnds.Checked;
+            UntouchBeamsPlane = checkBoxUntouchBeamsPlane.Checked;
+
             DialogResult = DialogResult.OK;
             Close();
         }

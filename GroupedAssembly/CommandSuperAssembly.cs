@@ -26,10 +26,10 @@ namespace GroupedAssembly
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-            var uiApp = commandData.Application;
-            var doc = commandData.Application.ActiveUIDocument.Document;
+            UIApplication uiApp = commandData.Application;
+            Document doc = commandData.Application.ActiveUIDocument.Document;
 
-            var sel = commandData.Application.ActiveUIDocument.Selection;
+            Autodesk.Revit.UI.Selection.Selection sel = commandData.Application.ActiveUIDocument.Selection;
 
             if (sel.GetElementIds().Count == 0)
             {
@@ -37,33 +37,34 @@ namespace GroupedAssembly
                 return Result.Failed;
             }
 
-            var form = new FormEnterName();
+            FormEnterName form = new FormEnterName();
             form.LabelText = "Укажите имя сборки:";
             form.ShowDialog();
             if (form.DialogResult != System.Windows.Forms.DialogResult.OK) return Result.Cancelled;
 
-            var name = form.NameText;
-            var groupedElements = form.GroupedElements;
-            var untouchBeams = form.UntouchBeams;
+            string name = form.NameText;
+            bool groupedElements = form.GroupedElements;
+            bool untouchBeamsEnds = form.UntouchBeamsEnds;
+            bool untouchBeamsPlane = form.UntouchBeamsPlane;
 
-            var selids = sel.GetElementIds().ToList();
-            var allIds = new List<ElementId>();
+            List<ElementId> selids = sel.GetElementIds().ToList();
+            List<ElementId> allIds = new List<ElementId>();
 
             Group group = null;
             AssemblyInstance ai = null;
 
             allIds = AssemblyUtil.GetAllNestedIds(doc, selids);
 
-            var finalSelIds = new List<ElementId>();
-            using (var t = new Transaction(doc))
+            List<ElementId> finalSelIds = new List<ElementId>();
+            using (Transaction t = new Transaction(doc))
             {
-                if (untouchBeams)
+                if (untouchBeamsEnds || untouchBeamsPlane)
                 {
-                    var beams = new List<FamilyInstance>();
+                    List<FamilyInstance> beams = new List<FamilyInstance>();
                     foreach (var ei in selids)
                     {
-                        var elem = doc.GetElement(ei);
-                        var fin = elem as FamilyInstance;
+                        Element elem = doc.GetElement(ei);
+                        FamilyInstance fin = elem as FamilyInstance;
                         if (fin == null) continue;
                         if (fin.Category.Id.IntegerValue != (int) BuiltInCategory.OST_StructuralFraming) continue;
                         if (fin.StructuralType != StructuralType.Beam
@@ -76,16 +77,21 @@ namespace GroupedAssembly
                     {
                         t.Start("Открепление балок");
 
-                        foreach (var fin in beams)
+                        foreach (FamilyInstance fin in beams)
                             try
                             {
-                                StructuralFramingUtils.DisallowJoinAtEnd(fin, 1);
-                                StructuralFramingUtils.DisallowJoinAtEnd(fin, 0);
-
-                                var oldElev = fin.get_Parameter(BuiltInParameter.STRUCTURAL_BEAM_END0_ELEVATION)
-                                        .AsDouble();
-                                fin.get_Parameter(BuiltInParameter.STRUCTURAL_BEAM_END0_ELEVATION).Set(1);
-                                fin.get_Parameter(BuiltInParameter.STRUCTURAL_BEAM_END0_ELEVATION).Set(oldElev);
+                                if (untouchBeamsEnds)
+                                {
+                                    StructuralFramingUtils.DisallowJoinAtEnd(fin, 1);
+                                    StructuralFramingUtils.DisallowJoinAtEnd(fin, 0);
+                                }
+                                if (untouchBeamsPlane)
+                                {
+                                    double oldElev = fin.get_Parameter(BuiltInParameter.STRUCTURAL_BEAM_END0_ELEVATION)
+                                            .AsDouble();
+                                    fin.get_Parameter(BuiltInParameter.STRUCTURAL_BEAM_END0_ELEVATION).Set(1);
+                                    fin.get_Parameter(BuiltInParameter.STRUCTURAL_BEAM_END0_ELEVATION).Set(oldElev);
+                                }
                             }
                             catch
                             {
@@ -97,16 +103,16 @@ namespace GroupedAssembly
 
 
                 allIds = AssemblyUtil.GetAllNestedIds(doc, selids);
-                var mainElem = doc.GetElement(selids.First());
+                Element mainElem = doc.GetElement(selids.First());
 
                 //проверяю, могут ли элементы использоваться в сборке
-                var idsForAssembly = new List<ElementId>();
-                var idsNotForAssembly = new List<ElementId>();
-                var messageAssemblyNotAllowed = "";
+                List<ElementId> idsForAssembly = new List<ElementId>();
+                List<ElementId> idsNotForAssembly = new List<ElementId>();
+                string messageAssemblyNotAllowed = "";
 
                 foreach (var id in allIds)
                 {
-                    var elem = doc.GetElement(id);
+                    Element elem = doc.GetElement(id);
                     if (elem.CanAssembling())
                     {
                         idsForAssembly.Add(id);
