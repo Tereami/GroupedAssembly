@@ -22,15 +22,21 @@ namespace GroupedAssembly
         public bool UntouchBeamsEnds;
         public bool UntouchBeamsPlane;
 
-        public FormEnterName()
+        public FormEnterName(bool assemblyByGroup, string defaultName)
         {
             InitializeComponent();
-        }
 
-        public string LabelText
-        {
-            get => label1.Text;
-            set => label1.Text = value;
+            txtBoxName.Text = defaultName;
+            if (assemblyByGroup)
+            {
+                label2.Text = "Создание сборки из группы";
+                checkBoxGroupElements.Enabled = false;
+                checkBoxGroupElements.Checked = false;
+                checkBoxUntouchBeamsEnds.Enabled = false;
+                checkBoxUntouchBeamsEnds.Checked = false;
+                checkBoxUntouchBeamsPlane.Enabled = false;
+                checkBoxUntouchBeamsPlane.Checked = false;
+            }
         }
 
         private void FormEnterName_Load(object sender, EventArgs e)

@@ -47,22 +47,23 @@ namespace GroupedAssembly
             this.checkBoxGroupElements = new System.Windows.Forms.CheckBox();
             this.checkBoxUntouchBeamsEnds = new System.Windows.Forms.CheckBox();
             this.checkBoxUntouchBeamsPlane = new System.Windows.Forms.CheckBox();
+            this.label2 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 9);
+            this.label1.Location = new System.Drawing.Point(12, 33);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(158, 13);
+            this.label1.Size = new System.Drawing.Size(32, 13);
             this.label1.TabIndex = 0;
-            this.label1.Text = "Укажите имя сборки/группы:";
+            this.label1.Text = "Имя:";
             // 
             // txtBoxName
             // 
             this.txtBoxName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtBoxName.Location = new System.Drawing.Point(12, 25);
+            this.txtBoxName.Location = new System.Drawing.Point(12, 51);
             this.txtBoxName.Name = "txtBoxName";
             this.txtBoxName.Size = new System.Drawing.Size(235, 20);
             this.txtBoxName.TabIndex = 1;
@@ -70,7 +71,7 @@ namespace GroupedAssembly
             // btnOk
             // 
             this.btnOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOk.Location = new System.Drawing.Point(91, 139);
+            this.btnOk.Location = new System.Drawing.Point(91, 160);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(75, 23);
             this.btnOk.TabIndex = 2;
@@ -82,7 +83,7 @@ namespace GroupedAssembly
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(172, 139);
+            this.btnCancel.Location = new System.Drawing.Point(172, 160);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 3;
@@ -93,7 +94,7 @@ namespace GroupedAssembly
             // checkBoxGroupElements
             // 
             this.checkBoxGroupElements.AutoSize = true;
-            this.checkBoxGroupElements.Location = new System.Drawing.Point(10, 63);
+            this.checkBoxGroupElements.Location = new System.Drawing.Point(12, 83);
             this.checkBoxGroupElements.Name = "checkBoxGroupElements";
             this.checkBoxGroupElements.Size = new System.Drawing.Size(156, 17);
             this.checkBoxGroupElements.TabIndex = 4;
@@ -103,7 +104,7 @@ namespace GroupedAssembly
             // checkBoxUntouchBeamsEnds
             // 
             this.checkBoxUntouchBeamsEnds.AutoSize = true;
-            this.checkBoxUntouchBeamsEnds.Location = new System.Drawing.Point(10, 86);
+            this.checkBoxUntouchBeamsEnds.Location = new System.Drawing.Point(12, 106);
             this.checkBoxUntouchBeamsEnds.Name = "checkBoxUntouchBeamsEnds";
             this.checkBoxUntouchBeamsEnds.Size = new System.Drawing.Size(148, 17);
             this.checkBoxUntouchBeamsEnds.TabIndex = 5;
@@ -113,12 +114,21 @@ namespace GroupedAssembly
             // checkBoxUntouchBeamsPlane
             // 
             this.checkBoxUntouchBeamsPlane.AutoSize = true;
-            this.checkBoxUntouchBeamsPlane.Location = new System.Drawing.Point(10, 109);
+            this.checkBoxUntouchBeamsPlane.Location = new System.Drawing.Point(12, 129);
             this.checkBoxUntouchBeamsPlane.Name = "checkBoxUntouchBeamsPlane";
             this.checkBoxUntouchBeamsPlane.Size = new System.Drawing.Size(195, 17);
             this.checkBoxUntouchBeamsPlane.TabIndex = 5;
             this.checkBoxUntouchBeamsPlane.Text = "Отсоединить балки от плоскости";
             this.checkBoxUntouchBeamsPlane.UseVisualStyleBackColor = true;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(12, 9);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(168, 13);
+            this.label2.TabIndex = 6;
+            this.label2.Text = "Создание сборки из элементов";
             // 
             // FormEnterName
             // 
@@ -126,7 +136,8 @@ namespace GroupedAssembly
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
-            this.ClientSize = new System.Drawing.Size(259, 174);
+            this.ClientSize = new System.Drawing.Size(259, 195);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.checkBoxUntouchBeamsPlane);
             this.Controls.Add(this.checkBoxUntouchBeamsEnds);
             this.Controls.Add(this.checkBoxGroupElements);
@@ -153,5 +164,6 @@ namespace GroupedAssembly
         private System.Windows.Forms.CheckBox checkBoxGroupElements;
         private System.Windows.Forms.CheckBox checkBoxUntouchBeamsEnds;
         private System.Windows.Forms.CheckBox checkBoxUntouchBeamsPlane;
+        private System.Windows.Forms.Label label2;
     }
 }

@@ -20,19 +20,25 @@ namespace GroupedAssembly
     {
         public static List<ElementId> GetAllNestedIds(Document doc, List<ElementId> selectedIds)
         {
-            var ids2 = new List<ElementId>();
+            List<ElementId> ids2 = new List<ElementId>();
 
-            foreach (var id in selectedIds)
+            foreach (ElementId id in selectedIds)
             {
                 ids2.Add(id);
-                var elem = doc.GetElement(id);
-                if (!(elem is FamilyInstance fi)) continue;
+                Element elem = doc.GetElement(id);
+                if (elem is FamilyInstance fi)
+                {
+                    List<FamilyInstance> nestedFamInstances = GetAllSharedNestedFamInstances(fi);
+                    if (nestedFamInstances.Count == 0) continue;
 
-                var nestedFamInstances = GetAllSharedNestedFamInstances(fi);
-                if (nestedFamInstances.Count == 0) continue;
-
-                var nestedFiIds = nestedFamInstances.Select(i => i.Id).ToList();
-                ids2.AddRange(nestedFiIds);
+                    List<ElementId> nestedFiIds = nestedFamInstances.Select(i => i.Id).ToList();
+                    ids2.AddRange(nestedFiIds);
+                }
+                else if(elem is Group)
+                {
+                    Group existGroup = elem as Group;
+                    ids2.AddRange(existGroup.GetMemberIds());
+                }
             }
 
             return ids2.Count == 0 ? null : ids2;

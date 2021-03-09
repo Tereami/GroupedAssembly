@@ -7,7 +7,7 @@
     </Assembly>
     <ClientId>fab775da-a88b-4042-8342-169e47238177</ClientId>
     <FullClassName>GroupedAssembly.App</FullClassName>
-    <VendorId>Weandrevit</VendorId>
-    <VendorDescription>weandrevit.blogspot.com</VendorDescription>
+    <VendorId>Bim-Startert</VendorId>
+    <VendorDescription>bim-starter.com</VendorDescription>
   </AddIn>
 </RevitAddIns>

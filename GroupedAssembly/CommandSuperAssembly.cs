@@ -1,14 +1,13 @@
-﻿//Данный код опубликован под лицензией Creative Commons Attribution-NonCommercial-ShareAlike.
-//Разрешено редактировать, изменять и брать данный код за основу для производных в некоммерческих целях,
+﻿//Данный код опубликован под лицензией Creative Commons Attribution-ShareAlike.
+//Разрешено редактировать, изменять и брать данный код за основу для производных в коммерческих и некоммерческих целях,
 //при условии указания авторства и если производные лицензируются на тех же условиях.
 //Программа поставляется "как есть". Автор не несет ответственности за возможные последствия её использования.
-//Зуев Александр, 2019, все права защищены.
-//This code is listed under the Creative Commons Attribution-NonCommercial-ShareAlike license.
-//You may redistribute, remix, tweak, and build upon this work non-commercially, 
+//Зуев Александр, 2021, все права защищены.
+//This code is listed under the Creative Commons Attribution-ShareAlike license.
+//You may redistribute, remix, tweak, and build upon this work commercially and non-commercially, 
 //as long as you credit the author by linking back and license your new creations under the same terms.
 //This code is provided 'as is'. Author disclaims any implied warranty. 
-//Zuev Aleksandr, 2019, all rigths reserved.
-
+//Zuev Aleksandr, 2021, all rigths reserved.
 
 using System;
 using System.Collections.Generic;
@@ -30,24 +29,36 @@ namespace GroupedAssembly
             Document doc = commandData.Application.ActiveUIDocument.Document;
 
             Autodesk.Revit.UI.Selection.Selection sel = commandData.Application.ActiveUIDocument.Selection;
+            List<ElementId> selids = sel.GetElementIds().ToList();
 
-            if (sel.GetElementIds().Count == 0)
+            if (selids.Count == 0)
             {
                 message = "Не выбраны элементы";
                 return Result.Failed;
             }
 
-            FormEnterName form = new FormEnterName();
-            form.LabelText = "Укажите имя сборки:";
-            form.ShowDialog();
-            if (form.DialogResult != System.Windows.Forms.DialogResult.OK) return Result.Cancelled;
+            bool createAssemblyByGroup = false;
+            string defaultName = "";
+            if(selids.Count == 1)
+            {
+                Group existGroup = doc.GetElement(selids[0]) as Group;
+                if(existGroup != null)
+                {
+                    createAssemblyByGroup = true;
+                    defaultName = existGroup.Name;
+                }
+            }
+
+
+            FormEnterName form = new FormEnterName(createAssemblyByGroup, defaultName);
+            if (form.ShowDialog() != System.Windows.Forms.DialogResult.OK) 
+                return Result.Cancelled;
 
             string name = form.NameText;
             bool groupedElements = form.GroupedElements;
             bool untouchBeamsEnds = form.UntouchBeamsEnds;
             bool untouchBeamsPlane = form.UntouchBeamsPlane;
 
-            List<ElementId> selids = sel.GetElementIds().ToList();
             List<ElementId> allIds = new List<ElementId>();
 
             Group group = null;
@@ -66,7 +77,7 @@ namespace GroupedAssembly
                         Element elem = doc.GetElement(ei);
                         FamilyInstance fin = elem as FamilyInstance;
                         if (fin == null) continue;
-                        if (fin.Category.Id.IntegerValue != (int) BuiltInCategory.OST_StructuralFraming) continue;
+                        if (fin.Category.Id.IntegerValue != (int)BuiltInCategory.OST_StructuralFraming) continue;
                         if (fin.StructuralType != StructuralType.Beam
                             && fin.StructuralType != StructuralType.Brace) continue;
 
@@ -103,14 +114,14 @@ namespace GroupedAssembly
 
 
                 allIds = AssemblyUtil.GetAllNestedIds(doc, selids);
-                Element mainElem = doc.GetElement(selids.First());
+
 
                 //проверяю, могут ли элементы использоваться в сборке
                 List<ElementId> idsForAssembly = new List<ElementId>();
                 List<ElementId> idsNotForAssembly = new List<ElementId>();
                 string messageAssemblyNotAllowed = "";
 
-                foreach (var id in allIds)
+                foreach (ElementId id in allIds)
                 {
                     Element elem = doc.GetElement(id);
                     if (elem.CanAssembling())
@@ -124,46 +135,55 @@ namespace GroupedAssembly
                     }
                 }
 
-                if (idsNotForAssembly.Count > 0)
-                    TaskDialog.Show("Внимание",
-                            "Некоторые элементы не были включены в сборку. ID: " + messageAssemblyNotAllowed);
+                if (idsNotForAssembly.Count > 0 && idsForAssembly.Count > 0)
+                {
+                    TaskDialog.Show("Внимание", "Не были включены в сборку элементы с id: " + messageAssemblyNotAllowed);
+                }
+                if(idsForAssembly.Count == 0)
+                {
+                    message = "Нет элементов, доступных для включения в сборку.";
+                    foreach(ElementId id in idsNotForAssembly)
+                    {
+                        elements.Insert(doc.GetElement(id));
+                    }
+                    return Result.Failed;
+                }
+                
+                Element mainElem = doc.GetElement(idsForAssembly.First());
 
+                t.Start("Создание сборки");
                 try
                 {
-                    t.Start("Создание сборки");
                     ai = AssemblyInstance.Create(doc, idsForAssembly, mainElem.Category.Id);
-                    t.Commit();
                 }
                 catch (Exception ex)
                 {
                     message += "Не удалось создать сборку: " + ex.Message;
                     return Result.Failed;
                 }
-
+                t.Commit();
+                t.Start("Задание имени сборки");
                 try
                 {
-                    t.Start("Именование сборки");
                     ai.AssemblyTypeName = name;
-                    t.Commit();
                 }
                 catch
                 {
                     message += "\nНе удалось задать имя сборки. Установлено имя: " + ai.AssemblyTypeName;
                 }
+                t.Commit();
+                t.Start("Создание группы");
 
                 if (groupedElements)
                 {
-                    t.Start("Создание группы");
                     group = doc.Create.NewGroup(allIds);
-                    t.Commit();
+                    
                     finalSelIds.Add(group.Id);
 
                     try
                     {
-                        t.Start("Именование группы");
                         var gtype = group.GroupType;
                         gtype.Name = name;
-                        t.Commit();
                     }
                     catch
                     {
@@ -174,6 +194,7 @@ namespace GroupedAssembly
                 {
                     finalSelIds.Add(ai.Id);
                 }
+                t.Commit();
             }
 
 
