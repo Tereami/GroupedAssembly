@@ -47,9 +47,6 @@ namespace GroupedAssembly
                     assemblyPath,
                     "GroupedAssembly.CommandSuperAssembly")
             ) as PushButton;
-            btnSuperAssembly.Image = PngImageSource("GroupedAssembly.Icons.SuperAssemblySmall.png");
-            btnSuperAssembly.LargeImage = PngImageSource("GroupedAssembly.Icons.SuperAssemblyBig.png");
-            btnSuperAssembly.ToolTip = "Создание сгруппированной сборки, с включением всех вложенных элементов";
 
             return Result.Succeeded;
         }
@@ -57,14 +54,6 @@ namespace GroupedAssembly
         public Result OnShutdown(UIControlledApplication application)
         {
             return Result.Succeeded;
-        }
-
-
-        private System.Windows.Media.ImageSource PngImageSource(string embeddedPathname)
-        {
-            var st = GetType().Assembly.GetManifestResourceStream(embeddedPathname);
-            var decoder = new PngBitmapDecoder(st, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.Default);
-            return decoder.Frames[0];
         }
     }
 }
