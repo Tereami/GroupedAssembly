@@ -37,7 +37,7 @@ namespace GroupedAssembly
 
             if (selids.Count == 0)
             {
-                message = "Не выбраны элементы";
+                message = MyStrings.ErrorNoSelectedElements;
                 return Result.Failed;
             }
 
@@ -57,8 +57,8 @@ namespace GroupedAssembly
             FormEnterName form = new FormEnterName(createAssemblyByGroup, defaultName);
             if (form.ShowDialog() != System.Windows.Forms.DialogResult.OK)
             {
-                return Result.Cancelled;
                 Debug.WriteLine("Cancelled");
+                return Result.Cancelled;
             }
 
             string name = form.NameText;
@@ -67,8 +67,8 @@ namespace GroupedAssembly
             bool untouchBeamsPlane = form.UntouchBeamsPlane;
             Debug.WriteLine("Name: " + name
                 + ", grouped " + groupedElements.ToString()
-                + ", untouch ends " + untouchBeamsEnds.ToString()
-                + ", untouch plane " + untouchBeamsPlane.ToString());
+                + ", detach ends " + untouchBeamsEnds.ToString()
+                + ", detach plane " + untouchBeamsPlane.ToString());
 
             List<ElementId> allIds = new List<ElementId>();
 
@@ -95,7 +95,7 @@ namespace GroupedAssembly
 
                     if (beams.Count > 0)
                     {
-                        t.Start("Открепление балок");
+                        t.Start("Detach beams");
 
                         foreach (FamilyInstance fin in beams)
                             try
@@ -104,7 +104,7 @@ namespace GroupedAssembly
                                 {
                                     StructuralFramingUtils.DisallowJoinAtEnd(fin, 1);
                                     StructuralFramingUtils.DisallowJoinAtEnd(fin, 0);
-                                    Debug.WriteLine("Untouch ends success for beam id " + fin.Id.IntegerValue.ToString());
+                                    Debug.WriteLine($"Detach ends success for beam id {fin.Id}");
                                 }
                                 if (untouchBeamsPlane)
                                 {
@@ -112,12 +112,12 @@ namespace GroupedAssembly
                                             .AsDouble();
                                     fin.get_Parameter(BuiltInParameter.STRUCTURAL_BEAM_END0_ELEVATION).Set(1);
                                     fin.get_Parameter(BuiltInParameter.STRUCTURAL_BEAM_END0_ELEVATION).Set(oldElev);
-                                    Debug.WriteLine("Untouch plane success for beam id " + fin.Id.IntegerValue.ToString());
+                                    Debug.WriteLine($"Detach plane success for beam id {fin.Id}");
                                 }
                             }
                             catch
                             {
-                                Debug.WriteLine("Untouch failed for beam id " + fin.Id.IntegerValue.ToString());
+                                Debug.WriteLine($"Untouch failed for beam id {fin.Id}");
                             }
 
                         t.Commit();
@@ -144,42 +144,43 @@ namespace GroupedAssembly
                     else
                     {
                         idsNotForAssembly.Add(id);
-                        messageAssemblyNotAllowed += id.IntegerValue.ToString() + "; ";
+                        messageAssemblyNotAllowed += id.ToString() + "; ";
                     }
                 }
 
                 if (idsNotForAssembly.Count > 0 && idsForAssembly.Count > 0)
                 {
-                    TaskDialog.Show("Внимание", "Не были включены в сборку элементы с id: " + messageAssemblyNotAllowed);
-                    Debug.WriteLine("Not allow for assembly: " + messageAssemblyNotAllowed);
+                    string msg = $"{MyStrings.ErrorElementsNotInclude}: {messageAssemblyNotAllowed}";
+                    TaskDialog.Show("Warning", msg);
+                    Debug.WriteLine(msg);
                 }
                 if(idsForAssembly.Count == 0)
                 {
-                    message = "Нет элементов, доступных для включения в сборку.";
+                    message = MyStrings.ErrorNoAllowedElements;
                     foreach(ElementId id in idsNotForAssembly)
                     {
                         elements.Insert(doc.GetElement(id));
                     }
-                    Debug.WriteLine("No elements allow for assembly");
+                    Debug.WriteLine(message);
                     return Result.Failed;
                 }
                 
                 Element mainElem = doc.GetElement(idsForAssembly.First());
 
-                t.Start("Создание сборки");
+                t.Start("Create assembly");
                 try
                 {
                     ai = AssemblyInstance.Create(doc, idsForAssembly, mainElem.Category.Id);
-                    Debug.WriteLine("Assembly created, id " + ai.Id.IntegerValue.ToString());
+                    Debug.WriteLine($"Assembly created, id {ai.Id}");
                 }
                 catch (Exception ex)
                 {
-                    message += "Не удалось создать сборку: " + ex.Message;
-                    Debug.WriteLine("Failed create assembly: " + ex.Message);
+                    message += $"{MyStrings.FailedToCreateAssembly}: {ex.Message}";
+                    Debug.WriteLine(message);
                     return Result.Failed;
                 }
                 t.Commit();
-                t.Start("Задание имени сборки");
+                t.Start("Set assembly name");
                 try
                 {
                     ai.AssemblyTypeName = name;
@@ -187,16 +188,16 @@ namespace GroupedAssembly
                 }
                 catch
                 {
-                    message += "\nНе удалось задать имя сборки. Установлено имя: " + ai.AssemblyTypeName;
-                    Debug.WriteLine("Failed new assembly name: " + name);
+                    message += $"\n: {MyStrings.FailedToSetAssemblyName} {ai.AssemblyTypeName}";
+                    Debug.WriteLine(message);
                 }
                 t.Commit();
-                t.Start("Создание группы");
+                t.Start("Create goup");
 
                 if (groupedElements)
                 {
                     group = doc.Create.NewGroup(allIds);
-                    Debug.WriteLine("Create group success, id " + group.Id.IntegerValue.ToString());
+                    Debug.WriteLine($"Create group success, id {group.Id}");
 
                     finalSelIds.Add(group.Id);
 
@@ -208,8 +209,8 @@ namespace GroupedAssembly
                     }
                     catch
                     {
-                        message += "\nНе удалось задать имя группы. Установлено имя: " + group.GroupType.Name;
-                        Debug.WriteLine("Failed to set group name");
+                        message += $"\n:{MyStrings.FailedToSetGroupName}: {group.GroupType.Name}";
+                        Debug.WriteLine(message);
                     }
                 }
                 else
