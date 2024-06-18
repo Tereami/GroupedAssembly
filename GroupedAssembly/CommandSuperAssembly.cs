@@ -26,14 +26,14 @@ namespace GroupedAssembly
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-            Debug.Listeners.Clear();
-            Debug.Listeners.Add(new RbsLogger.Logger("SuperAssembly"));
+            Trace.Listeners.Clear();
+            Trace.Listeners.Add(new RbsLogger.Logger("SuperAssembly"));
             UIApplication uiApp = commandData.Application;
             Document doc = commandData.Application.ActiveUIDocument.Document;
 
             Autodesk.Revit.UI.Selection.Selection sel = commandData.Application.ActiveUIDocument.Selection;
             List<ElementId> selids = sel.GetElementIds().ToList();
-            Debug.WriteLine("Selected elements:" + selids.Count.ToString());
+            Trace.WriteLine("Selected elements:" + selids.Count.ToString());
 
             if (selids.Count == 0)
             {
@@ -50,14 +50,14 @@ namespace GroupedAssembly
                 {
                     createAssemblyByGroup = true;
                     defaultName = existGroup.Name;
-                    Debug.WriteLine("Creaty by existed group: " + defaultName);
+                    Trace.WriteLine("Creaty by existed group: " + defaultName);
                 }
             }
 
             FormEnterName form = new FormEnterName(createAssemblyByGroup, defaultName);
             if (form.ShowDialog() != System.Windows.Forms.DialogResult.OK)
             {
-                Debug.WriteLine("Cancelled");
+                Trace.WriteLine("Cancelled");
                 return Result.Cancelled;
             }
 
@@ -65,7 +65,7 @@ namespace GroupedAssembly
             bool groupedElements = form.GroupedElements;
             bool untouchBeamsEnds = form.UntouchBeamsEnds;
             bool untouchBeamsPlane = form.UntouchBeamsPlane;
-            Debug.WriteLine("Name: " + name
+            Trace.WriteLine("Name: " + name
                 + ", grouped " + groupedElements.ToString()
                 + ", detach ends " + untouchBeamsEnds.ToString()
                 + ", detach plane " + untouchBeamsPlane.ToString());
@@ -86,7 +86,7 @@ namespace GroupedAssembly
                         Element elem = doc.GetElement(ei);
                         FamilyInstance fin = elem as FamilyInstance;
                         if (fin == null) continue;
-                        if (fin.Category.Id.IntegerValue != (int)BuiltInCategory.OST_StructuralFraming) continue;
+                        if (fin.Category.Id.GetValue() != (int)BuiltInCategory.OST_StructuralFraming) continue;
                         if (fin.StructuralType != StructuralType.Beam
                             && fin.StructuralType != StructuralType.Brace) continue;
 
@@ -104,7 +104,7 @@ namespace GroupedAssembly
                                 {
                                     StructuralFramingUtils.DisallowJoinAtEnd(fin, 1);
                                     StructuralFramingUtils.DisallowJoinAtEnd(fin, 0);
-                                    Debug.WriteLine($"Detach ends success for beam id {fin.Id}");
+                                    Trace.WriteLine($"Detach ends success for beam id {fin.Id}");
                                 }
                                 if (untouchBeamsPlane)
                                 {
@@ -112,12 +112,12 @@ namespace GroupedAssembly
                                             .AsDouble();
                                     fin.get_Parameter(BuiltInParameter.STRUCTURAL_BEAM_END0_ELEVATION).Set(1);
                                     fin.get_Parameter(BuiltInParameter.STRUCTURAL_BEAM_END0_ELEVATION).Set(oldElev);
-                                    Debug.WriteLine($"Detach plane success for beam id {fin.Id}");
+                                    Trace.WriteLine($"Detach plane success for beam id {fin.Id}");
                                 }
                             }
                             catch
                             {
-                                Debug.WriteLine($"Untouch failed for beam id {fin.Id}");
+                                Trace.WriteLine($"Untouch failed for beam id {fin.Id}");
                             }
 
                         t.Commit();
@@ -126,7 +126,7 @@ namespace GroupedAssembly
 
 
                 allIds = AssemblyUtil.GetAllNestedIds(doc, selids);
-                Debug.WriteLine("Nested elems found: " + allIds.Count.ToString());
+                Trace.WriteLine("Nested elems found: " + allIds.Count.ToString());
 
 
                 //проверяю, могут ли элементы использоваться в сборке
@@ -152,7 +152,7 @@ namespace GroupedAssembly
                 {
                     string msg = $"{MyStrings.ErrorElementsNotInclude}: {messageAssemblyNotAllowed}";
                     TaskDialog.Show("Warning", msg);
-                    Debug.WriteLine(msg);
+                    Trace.WriteLine(msg);
                 }
                 if(idsForAssembly.Count == 0)
                 {
@@ -161,7 +161,7 @@ namespace GroupedAssembly
                     {
                         elements.Insert(doc.GetElement(id));
                     }
-                    Debug.WriteLine(message);
+                    Trace.WriteLine(message);
                     return Result.Failed;
                 }
                 
@@ -171,12 +171,12 @@ namespace GroupedAssembly
                 try
                 {
                     ai = AssemblyInstance.Create(doc, idsForAssembly, mainElem.Category.Id);
-                    Debug.WriteLine($"Assembly created, id {ai.Id}");
+                    Trace.WriteLine($"Assembly created, id {ai.Id}");
                 }
                 catch (Exception ex)
                 {
                     message += $"{MyStrings.FailedToCreateAssembly}: {ex.Message}";
-                    Debug.WriteLine(message);
+                    Trace.WriteLine(message);
                     return Result.Failed;
                 }
                 t.Commit();
@@ -184,12 +184,12 @@ namespace GroupedAssembly
                 try
                 {
                     ai.AssemblyTypeName = name;
-                    Debug.WriteLine("New assembly name: " + name);
+                    Trace.WriteLine("New assembly name: " + name);
                 }
                 catch
                 {
                     message += $"\n: {MyStrings.FailedToSetAssemblyName} {ai.AssemblyTypeName}";
-                    Debug.WriteLine(message);
+                    Trace.WriteLine(message);
                 }
                 t.Commit();
                 t.Start("Create goup");
@@ -197,7 +197,7 @@ namespace GroupedAssembly
                 if (groupedElements)
                 {
                     group = doc.Create.NewGroup(allIds);
-                    Debug.WriteLine($"Create group success, id {group.Id}");
+                    Trace.WriteLine($"Create group success, id {group.Id}");
 
                     finalSelIds.Add(group.Id);
 
@@ -205,12 +205,12 @@ namespace GroupedAssembly
                     {
                         GroupType gtype = group.GroupType;
                         gtype.Name = name;
-                        Debug.WriteLine("New group name: " + name);
+                        Trace.WriteLine("New group name: " + name);
                     }
                     catch
                     {
                         message += $"\n:{MyStrings.FailedToSetGroupName}: {group.GroupType.Name}";
-                        Debug.WriteLine(message);
+                        Trace.WriteLine(message);
                     }
                 }
                 else
@@ -222,7 +222,7 @@ namespace GroupedAssembly
 
 
             sel.SetElementIds(finalSelIds);
-            Debug.WriteLine("Success, final ids: " + finalSelIds.Count.ToString());
+            Trace.WriteLine("Success, final ids: " + finalSelIds.Count.ToString());
 
             return Result.Succeeded;
         }
