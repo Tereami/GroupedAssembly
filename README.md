@@ -1,2 +1,2 @@
-# GroupedAssembly
-Приложение для удобного создания сборок и групп в Revit
+This repositery is obsolete.
+The plugin is now here: https://github.com/Tereami/BimStarter
